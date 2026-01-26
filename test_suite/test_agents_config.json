@@ -1,0 +1,41 @@
+{
+  "test_agents": [
+    {
+      "name": "gmail_agent",
+      "description": "Gmail Agent - Reference agent matching my_agent structure",
+      "input_file": "test_inputs/gmail_agent.json"
+    },
+    {
+      "name": "slack_agent",
+      "description": "Slack Agent - Messaging and notifications",
+      "input_file": "test_inputs/slack_agent.json"
+    },
+    {
+      "name": "notion_agent",
+      "description": "Notion Agent - Document management",
+      "input_file": "test_inputs/notion_agent.json"
+    },
+    {
+      "name": "github_agent",
+      "description": "GitHub Agent - Code repository operations",
+      "input_file": "test_inputs/github_agent.json"
+    },
+    {
+      "name": "multi_tool_agent",
+      "description": "Multi-tool Agent - Gmail + Job Search combination",
+      "input_file": "test_inputs/multi_tool_agent.json"
+    },
+    {
+      "name": "simple_agent",
+      "description": "Simple Agent - Single tool, minimal actions",
+      "input_file": "test_inputs/simple_agent.json"
+    },
+    {
+      "name": "complex_agent",
+      "description": "Complex Agent - Multiple tools, many actions, complex schemas",
+      "input_file": "test_inputs/complex_agent.json"
+    }
+  ],
+  "output_dir": "./test_generated_agents",
+  "reference_agent_path": "../my_agent"
+}

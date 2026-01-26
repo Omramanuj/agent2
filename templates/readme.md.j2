@@ -1,0 +1,167 @@
+# {{ agent_name }}
+
+{{ agent_description }}
+
+A {{ agent_name|lower }} built using Google's Agent Development Kit (ADK) that integrates with Pipedream MCP tools.
+
+## Setup
+
+### 1. Install Dependencies
+
+```bash
+pip install -r requirements.txt
+```
+
+Or install individually:
+```bash
+pip install google-adk mcp pipedream python-dotenv
+```
+
+**⚠️ Important:** Make sure to install dependencies in the same Python environment where ADK is running. If you're using `adk web`, ensure the packages are installed in the Python environment that ADK uses.
+
+### 2. Configure Environment
+
+Create a `.env` file with your credentials:
+
+```env
+# Google API Key (get from https://aistudio.google.com/apikey)
+GOOGLE_API_KEY=your_google_api_key_here
+
+# Pipedream Credentials (get from your Pipedream project settings)
+PIPEDREAM_PROJECT_ID=your_project_id
+PIPEDREAM_CLIENT_ID=your_client_id
+PIPEDREAM_CLIENT_SECRET=your_client_secret
+
+# Optional: Pipedream configuration
+PIPEDREAM_ENVIRONMENT=development
+EXTERNAL_USER_ID={{ pipedream_user_ids.get(tools_required[0].tool_slug, 'test-user-123') if tools_required else 'test-user-123' }}
+APP_SLUG={{ tools_required[0].tool_slug if tools_required else 'default' }}
+```
+
+### 3. Connect Tools in Pipedream
+
+Make sure you have connected your accounts in your Pipedream project dashboard. The agent will use the tools available through Pipedream's MCP server.
+
+## Running the Agent
+
+### Using ADK CLI (Recommended)
+
+```bash
+# Run the agent
+adk run .
+
+# Or use the web UI (recommended for development)
+adk web
+```
+
+Then select your agent from the dropdown in the web UI.
+
+### Using Python Directly
+
+```python
+from agent import root_agent
+
+# The agent is already initialized as root_agent
+# You can use it with ADK's Runner or other ADK components
+from google.adk import Runner
+
+runner = Runner(root_agent)
+# Use runner to interact with the agent
+```
+
+## Available Actions
+
+{%- for action in actions %}
+- **{{ action.name }}**: {{ action.description }}
+  - Tool: `{{ action.tool_slug }}`
+{%- endfor %}
+
+## Available Tools
+
+{%- for tool in tools_required %}
+- **{{ tool.tool_slug }}**: {{ tool.purpose }}
+  - Provider: {{ tool.provider }}
+  - Auth Required: {{ tool.auth_required }}
+{%- endfor %}
+
+## Example Queries
+
+{%- for example in examples %}
+**User:** {{ example.user }}
+**Assistant:** {{ example.assistant }}
+
+{%- endfor %}
+
+## Project Structure
+
+```
+.
+├── __init__.py              # Module initialization
+├── agent.py                 # Main agent definition
+├── config/
+│   ├── __init__.py
+│   └── agent_config.py      # Agent configuration
+├── tools/
+│   ├── __init__.py
+│   ├── pipedream_client.py  # Pipedream MCP client
+│   └── pipedream_tools.py   # Tool creation and management
+├── requirements.txt         # Python dependencies
+└── README.md               # This file
+```
+
+## Features
+
+- **Multi-tool Agent**: Dynamically loads all available tools from Pipedream
+- **Natural Language Interface**: Uses Gemini to understand user requests
+- **Modular Architecture**: Clean separation of concerns with dedicated modules
+
+## Troubleshooting
+
+### "Pipedream SDK not installed" or "MCP library not installed"
+
+**Solution:**
+1. Install all dependencies:
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+2. **If using ADK web UI**, make sure you install packages in the same Python environment:
+   ```bash
+   # Check which Python ADK uses
+   which python3
+   # or
+   which adk
+   
+   # Install using that Python
+   python3 -m pip install -r requirements.txt
+   ```
+
+3. **Restart the ADK web server** after installing:
+   - Stop `adk web` (Ctrl+C)
+   - Start it again: `adk web`
+   - Refresh your browser
+
+4. Verify installation:
+   ```bash
+   python3 -c "import pipedream; import mcp; print('✅ All packages installed')"
+   ```
+
+### "Missing Pipedream credentials"
+
+Check that your `.env` file exists and contains:
+- `PIPEDREAM_PROJECT_ID`
+- `PIPEDREAM_CLIENT_ID`
+- `PIPEDREAM_CLIENT_SECRET`
+
+### "No tools available"
+
+1. Check that your Pipedream credentials are correct in `.env`
+2. Verify your accounts are connected in your Pipedream project
+3. Check that `APP_SLUG` is set correctly
+
+### "GOOGLE_API_KEY not set"
+
+Set your Google API key in the `.env` file:
+```
+GOOGLE_API_KEY=your_api_key_here
+```

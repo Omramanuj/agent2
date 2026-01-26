@@ -1,0 +1,180 @@
+{
+  "pipeline_id": "test-complex-agent",
+  "agent_spec_version": "v1",
+  "user_query": "Create a complex agent with multiple tools and many actions",
+  
+  "agent_spec": {
+    "name": "Complex Multi-Tool Agent",
+    "description": "A complex agent with multiple tools, many actions, and complex schemas",
+    "runtime": {
+      "framework": "google-adk",
+      "language": "python",
+      "model": "gemini-2.5-flash"
+    },
+    
+    "tools_required": [
+      {
+        "tool_slug": "gmail",
+        "provider": "pipedream",
+        "purpose": "Gmail operations",
+        "auth_required": true,
+        "scopes": ["https://www.googleapis.com/auth/gmail.send", "https://www.googleapis.com/auth/gmail.readonly"],
+        "connection_key": "gmail_connection"
+      },
+      {
+        "tool_slug": "slack",
+        "provider": "pipedream",
+        "purpose": "Slack messaging",
+        "auth_required": true,
+        "scopes": ["chat:write", "channels:read"],
+        "connection_key": "slack_connection"
+      },
+      {
+        "tool_slug": "notion",
+        "provider": "pipedream",
+        "purpose": "Notion document operations",
+        "auth_required": true,
+        "scopes": ["read", "write"],
+        "connection_key": "notion_connection"
+      }
+    ],
+    
+    "actions": [
+      {
+        "name": "send_email",
+        "description": "Send an email via Gmail",
+        "tool_slug": "gmail",
+        "input_schema": {
+          "type": "object",
+          "properties": {
+            "to": {"type": "string", "description": "Recipient email address"},
+            "subject": {"type": "string", "description": "Email subject"},
+            "body": {"type": "string", "description": "Email body"},
+            "cc": {"type": "array", "items": {"type": "string"}, "description": "CC recipients"},
+            "bcc": {"type": "array", "items": {"type": "string"}, "description": "BCC recipients"}
+          },
+          "required": ["to", "subject", "body"]
+        }
+      },
+      {
+        "name": "list_emails",
+        "description": "List Gmail messages",
+        "tool_slug": "gmail",
+        "input_schema": {
+          "type": "object",
+          "properties": {
+            "max_results": {"type": "integer", "description": "Maximum number of results"},
+            "query": {"type": "string", "description": "Search query"}
+          }
+        }
+      },
+      {
+        "name": "send_slack_message",
+        "description": "Send a message to Slack",
+        "tool_slug": "slack",
+        "input_schema": {
+          "type": "object",
+          "properties": {
+            "channel": {"type": "string", "description": "Channel name or ID"},
+            "text": {"type": "string", "description": "Message text"},
+            "thread_ts": {"type": "string", "description": "Thread timestamp"}
+          },
+          "required": ["channel", "text"]
+        }
+      },
+      {
+        "name": "list_slack_channels",
+        "description": "List Slack channels",
+        "tool_slug": "slack",
+        "input_schema": {
+          "type": "object",
+          "properties": {}
+        }
+      },
+      {
+        "name": "create_notion_page",
+        "description": "Create a Notion page",
+        "tool_slug": "notion",
+        "input_schema": {
+          "type": "object",
+          "properties": {
+            "title": {"type": "string", "description": "Page title"},
+            "parent_id": {"type": "string", "description": "Parent page ID"},
+            "content": {"type": "array", "items": {"type": "object"}, "description": "Page content blocks"}
+          },
+          "required": ["title"]
+        }
+      },
+      {
+        "name": "search_notion_pages",
+        "description": "Search Notion pages",
+        "tool_slug": "notion",
+        "input_schema": {
+          "type": "object",
+          "properties": {
+            "query": {"type": "string", "description": "Search query"},
+            "filter": {"type": "object", "description": "Filter criteria"}
+          },
+          "required": ["query"]
+        }
+      }
+    ],
+    
+    "examples": [
+      {
+        "user": "Send an email and post to Slack",
+        "assistant": "I'll send the email and post to Slack for you."
+      },
+      {
+        "user": "Create a Notion page and notify in Slack",
+        "assistant": "I'll create the page and send a notification."
+      }
+    ]
+  },
+  
+  "tool_registry": [
+    {
+      "tool_slug": "gmail",
+      "display_name": "Gmail",
+      "provider": "pipedream",
+      "auth_type": "oauth",
+      "scopes": ["https://www.googleapis.com/auth/gmail.send", "https://www.googleapis.com/auth/gmail.readonly"],
+      "metadata": {
+        "workflow_id": "gmail_workflow_123"
+      }
+    },
+    {
+      "tool_slug": "slack",
+      "display_name": "Slack",
+      "provider": "pipedream",
+      "auth_type": "oauth",
+      "scopes": ["chat:write", "channels:read"],
+      "metadata": {
+        "workflow_id": "slack_workflow_456"
+      }
+    },
+    {
+      "tool_slug": "notion",
+      "display_name": "Notion",
+      "provider": "pipedream",
+      "auth_type": "oauth",
+      "scopes": ["read", "write"],
+      "metadata": {
+        "workflow_id": "notion_workflow_789"
+      }
+    }
+  ],
+  
+  "integrations": {
+    "pipedream": {
+      "external_user_ids": {
+        "gmail": "pd_user_gmail_123",
+        "slack": "pd_user_slack_456",
+        "notion": "pd_user_notion_789"
+      },
+      "project_id": "test_pipedream_project",
+      "client_id": "test_client_id",
+      "client_secret": "test_client_secret"
+    }
+  }
+}

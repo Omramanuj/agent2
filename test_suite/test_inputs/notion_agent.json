@@ -1,0 +1,89 @@
+{
+  "pipeline_id": "test-notion-agent",
+  "agent_spec_version": "v1",
+  "user_query": "Create a Notion agent that can create pages and search pages",
+  
+  "agent_spec": {
+    "name": "Notion Agent",
+    "description": "A helpful Notion assistant for document management",
+    "runtime": {
+      "framework": "google-adk",
+      "language": "python",
+      "model": "gemini-2.5-flash"
+    },
+    
+    "tools_required": [
+      {
+        "tool_slug": "notion",
+        "provider": "pipedream",
+        "purpose": "Notion document operations",
+        "auth_required": true,
+        "scopes": ["read", "write"],
+        "connection_key": "notion_connection"
+      }
+    ],
+    
+    "actions": [
+      {
+        "name": "create_page",
+        "description": "Create a new Notion page",
+        "tool_slug": "notion",
+        "input_schema": {
+          "type": "object",
+          "properties": {
+            "title": {"type": "string", "description": "Page title"},
+            "parent_id": {"type": "string", "description": "Parent page ID"}
+          },
+          "required": ["title"]
+        }
+      },
+      {
+        "name": "search_pages",
+        "description": "Search for Notion pages",
+        "tool_slug": "notion",
+        "input_schema": {
+          "type": "object",
+          "properties": {
+            "query": {"type": "string", "description": "Search query"}
+          },
+          "required": ["query"]
+        }
+      }
+    ],
+    
+    "examples": [
+      {
+        "user": "Create a page titled 'Meeting Notes'",
+        "assistant": "I'll create that page for you."
+      },
+      {
+        "user": "Search for pages about 'project planning'",
+        "assistant": "I'll search for those pages."
+      }
+    ]
+  },
+  
+  "tool_registry": [
+    {
+      "tool_slug": "notion",
+      "display_name": "Notion",
+      "provider": "pipedream",
+      "auth_type": "oauth",
+      "scopes": ["read", "write"],
+      "metadata": {
+        "workflow_id": "notion_workflow_789"
+      }
+    }
+  ],
+  
+  "integrations": {
+    "pipedream": {
+      "external_user_ids": {
+        "notion": "pd_user_notion_789"
+      },
+      "project_id": "test_pipedream_project",
+      "client_id": "test_client_id",
+      "client_secret": "test_client_secret"
+    }
+  }
+}

@@ -1,0 +1,110 @@
+{
+  "pipeline_id": "test-multi-tool-agent",
+  "agent_spec_version": "v1",
+  "user_query": "Create an agent that can send emails via Gmail and search for jobs",
+  
+  "agent_spec": {
+    "name": "Email and Job Search Agent",
+    "description": "An agent that can send emails via Gmail and search for jobs",
+    "runtime": {
+      "framework": "google-adk",
+      "language": "python",
+      "model": "gemini-2.5-flash"
+    },
+    
+    "tools_required": [
+      {
+        "tool_slug": "gmail_send",
+        "provider": "pipedream",
+        "purpose": "Send emails via Gmail",
+        "auth_required": true,
+        "scopes": ["https://www.googleapis.com/auth/gmail.send"],
+        "connection_key": "gmail_connection"
+      },
+      {
+        "tool_slug": "job_search",
+        "provider": "pipedream",
+        "purpose": "Search for job listings",
+        "auth_required": false,
+        "scopes": [],
+        "connection_key": ""
+      }
+    ],
+    
+    "actions": [
+      {
+        "name": "send_email",
+        "description": "Send an email to a recipient with a subject and body",
+        "tool_slug": "gmail_send",
+        "input_schema": {
+          "type": "object",
+          "properties": {
+            "to": {"type": "string", "description": "Recipient email address"},
+            "subject": {"type": "string", "description": "Email subject"},
+            "body": {"type": "string", "description": "Email body"}
+          },
+          "required": ["to", "subject", "body"]
+        }
+      },
+      {
+        "name": "search_jobs",
+        "description": "Search for job listings based on keywords, location, and other criteria",
+        "tool_slug": "job_search",
+        "input_schema": {
+          "type": "object",
+          "properties": {
+            "keywords": {"type": "string", "description": "Job search keywords"},
+            "location": {"type": "string", "description": "Job location"},
+            "limit": {"type": "integer", "description": "Maximum number of results"}
+          },
+          "required": ["keywords"]
+        }
+      }
+    ],
+    
+    "examples": [
+      {
+        "user": "Send an email to john@example.com with subject 'Hello' and body 'This is a test'",
+        "assistant": "I'll send that email for you."
+      },
+      {
+        "user": "Find software engineering jobs in San Francisco",
+        "assistant": "I'll search for software engineering jobs in San Francisco."
+      }
+    ]
+  },
+  
+  "tool_registry": [
+    {
+      "tool_slug": "gmail_send",
+      "display_name": "Gmail Send Email",
+      "provider": "pipedream",
+      "auth_type": "oauth",
+      "scopes": ["https://www.googleapis.com/auth/gmail.send"],
+      "metadata": {
+        "workflow_id": "gmail_send_workflow_123"
+      }
+    },
+    {
+      "tool_slug": "job_search",
+      "display_name": "Job Search",
+      "provider": "pipedream",
+      "auth_type": "none",
+      "scopes": [],
+      "metadata": {
+        "workflow_id": "job_search_workflow_456"
+      }
+    }
+  ],
+  
+  "integrations": {
+    "pipedream": {
+      "external_user_ids": {
+        "gmail_send": "pd_user_gmail_123"
+      },
+      "project_id": "test_pipedream_project",
+      "client_id": "test_client_id",
+      "client_secret": "test_client_secret"
+    }
+  }
+}

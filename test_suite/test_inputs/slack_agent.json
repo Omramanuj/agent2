@@ -1,0 +1,86 @@
+{
+  "pipeline_id": "test-slack-agent",
+  "agent_spec_version": "v1",
+  "user_query": "Create a Slack agent that can send messages and list channels",
+  
+  "agent_spec": {
+    "name": "Slack Agent",
+    "description": "A helpful Slack assistant for messaging and channel management",
+    "runtime": {
+      "framework": "google-adk",
+      "language": "python",
+      "model": "gemini-2.5-flash"
+    },
+    
+    "tools_required": [
+      {
+        "tool_slug": "slack",
+        "provider": "pipedream",
+        "purpose": "Slack messaging",
+        "auth_required": true,
+        "scopes": ["chat:write", "channels:read"],
+        "connection_key": "slack_connection"
+      }
+    ],
+    
+    "actions": [
+      {
+        "name": "send_message",
+        "description": "Send a message to a Slack channel",
+        "tool_slug": "slack",
+        "input_schema": {
+          "type": "object",
+          "properties": {
+            "channel": {"type": "string", "description": "Channel name or ID"},
+            "text": {"type": "string", "description": "Message text"}
+          },
+          "required": ["channel", "text"]
+        }
+      },
+      {
+        "name": "list_channels",
+        "description": "List available Slack channels",
+        "tool_slug": "slack",
+        "input_schema": {
+          "type": "object",
+          "properties": {}
+        }
+      }
+    ],
+    
+    "examples": [
+      {
+        "user": "Send a message to #general saying 'Hello team'",
+        "assistant": "I'll send that message to #general."
+      },
+      {
+        "user": "List all channels",
+        "assistant": "I'll list all available channels."
+      }
+    ]
+  },
+  
+  "tool_registry": [
+    {
+      "tool_slug": "slack",
+      "display_name": "Slack",
+      "provider": "pipedream",
+      "auth_type": "oauth",
+      "scopes": ["chat:write", "channels:read"],
+      "metadata": {
+        "workflow_id": "slack_workflow_456"
+      }
+    }
+  ],
+  
+  "integrations": {
+    "pipedream": {
+      "external_user_ids": {
+        "slack": "pd_user_slack_456"
+      },
+      "project_id": "test_pipedream_project",
+      "client_id": "test_client_id",
+      "client_secret": "test_client_secret"
+    }
+  }
+}

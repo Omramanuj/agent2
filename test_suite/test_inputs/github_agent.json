@@ -1,0 +1,89 @@
+{
+  "pipeline_id": "test-github-agent",
+  "agent_spec_version": "v1",
+  "user_query": "Create a GitHub agent that can create issues and list repositories",
+  
+  "agent_spec": {
+    "name": "GitHub Agent",
+    "description": "A helpful GitHub assistant for code repository operations",
+    "runtime": {
+      "framework": "google-adk",
+      "language": "python",
+      "model": "gemini-2.5-flash"
+    },
+    
+    "tools_required": [
+      {
+        "tool_slug": "github",
+        "provider": "pipedream",
+        "purpose": "GitHub repository operations",
+        "auth_required": true,
+        "scopes": ["repo", "issues:write"],
+        "connection_key": "github_connection"
+      }
+    ],
+    
+    "actions": [
+      {
+        "name": "create_issue",
+        "description": "Create a new GitHub issue",
+        "tool_slug": "github",
+        "input_schema": {
+          "type": "object",
+          "properties": {
+            "repo": {"type": "string", "description": "Repository name (owner/repo)"},
+            "title": {"type": "string", "description": "Issue title"},
+            "body": {"type": "string", "description": "Issue body"}
+          },
+          "required": ["repo", "title"]
+        }
+      },
+      {
+        "name": "list_repositories",
+        "description": "List GitHub repositories",
+        "tool_slug": "github",
+        "input_schema": {
+          "type": "object",
+          "properties": {
+            "type": {"type": "string", "description": "Repository type (all, owner, member)"}
+          }
+        }
+      }
+    ],
+    
+    "examples": [
+      {
+        "user": "Create an issue in myrepo/example titled 'Bug fix needed'",
+        "assistant": "I'll create that issue for you."
+      },
+      {
+        "user": "List all my repositories",
+        "assistant": "I'll list your repositories."
+      }
+    ]
+  },
+  
+  "tool_registry": [
+    {
+      "tool_slug": "github",
+      "display_name": "GitHub",
+      "provider": "pipedream",
+      "auth_type": "oauth",
+      "scopes": ["repo", "issues:write"],
+      "metadata": {
+        "workflow_id": "github_workflow_101"
+      }
+    }
+  ],
+  
+  "integrations": {
+    "pipedream": {
+      "external_user_ids": {
+        "github": "pd_user_github_101"
+      },
+      "project_id": "test_pipedream_project",
+      "client_id": "test_client_id",
+      "client_secret": "test_client_secret"
+    }
+  }
+}

@@ -1,0 +1,105 @@
+{
+  "pipeline_id": "test-gmail-agent",
+  "agent_spec_version": "v1",
+  "user_query": "Create a Gmail agent that can send emails, list messages, and search emails",
+  
+  "agent_spec": {
+    "name": "Gmail Agent",
+    "description": "A helpful Gmail assistant that can help users manage their email",
+    "runtime": {
+      "framework": "google-adk",
+      "language": "python",
+      "model": "gemini-2.5-flash"
+    },
+    
+    "tools_required": [
+      {
+        "tool_slug": "gmail",
+        "provider": "pipedream",
+        "purpose": "Gmail operations",
+        "auth_required": true,
+        "scopes": ["https://www.googleapis.com/auth/gmail.send", "https://www.googleapis.com/auth/gmail.readonly"],
+        "connection_key": "gmail_connection"
+      }
+    ],
+    
+    "actions": [
+      {
+        "name": "send_email",
+        "description": "Send an email to a recipient",
+        "tool_slug": "gmail",
+        "input_schema": {
+          "type": "object",
+          "properties": {
+            "to": {"type": "string", "description": "Recipient email address"},
+            "subject": {"type": "string", "description": "Email subject"},
+            "body": {"type": "string", "description": "Email body"}
+          },
+          "required": ["to", "subject", "body"]
+        }
+      },
+      {
+        "name": "list_messages",
+        "description": "List email messages",
+        "tool_slug": "gmail",
+        "input_schema": {
+          "type": "object",
+          "properties": {
+            "max_results": {"type": "integer", "description": "Maximum number of results"}
+          }
+        }
+      },
+      {
+        "name": "search_emails",
+        "description": "Search for emails",
+        "tool_slug": "gmail",
+        "input_schema": {
+          "type": "object",
+          "properties": {
+            "query": {"type": "string", "description": "Search query"}
+          },
+          "required": ["query"]
+        }
+      }
+    ],
+    
+    "examples": [
+      {
+        "user": "Send an email to john@example.com with subject 'Hello' and body 'This is a test'",
+        "assistant": "I'll send that email for you."
+      },
+      {
+        "user": "List my last 5 emails",
+        "assistant": "I'll list your recent emails."
+      },
+      {
+        "user": "Search for emails from alice",
+        "assistant": "I'll search for emails from alice."
+      }
+    ]
+  },
+  
+  "tool_registry": [
+    {
+      "tool_slug": "gmail",
+      "display_name": "Gmail",
+      "provider": "pipedream",
+      "auth_type": "oauth",
+      "scopes": ["https://www.googleapis.com/auth/gmail.send", "https://www.googleapis.com/auth/gmail.readonly"],
+      "metadata": {
+        "workflow_id": "gmail_workflow_123"
+      }
+    }
+  ],
+  
+  "integrations": {
+    "pipedream": {
+      "external_user_ids": {
+        "gmail": "pd_user_gmail_123"
+      },
+      "project_id": "test_pipedream_project",
+      "client_id": "test_client_id",
+      "client_secret": "test_client_secret"
+    }
+  }
+}

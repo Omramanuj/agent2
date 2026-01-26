@@ -1,0 +1,70 @@
+{
+  "pipeline_id": "test-simple-agent",
+  "agent_spec_version": "v1",
+  "user_query": "Create a simple agent with a single tool",
+  
+  "agent_spec": {
+    "name": "Simple Agent",
+    "description": "A simple agent with minimal configuration",
+    "runtime": {
+      "framework": "google-adk",
+      "language": "python",
+      "model": "gemini-2.5-flash"
+    },
+    
+    "tools_required": [
+      {
+        "tool_slug": "simple_tool",
+        "provider": "pipedream",
+        "purpose": "Simple operations",
+        "auth_required": false,
+        "scopes": [],
+        "connection_key": ""
+      }
+    ],
+    
+    "actions": [
+      {
+        "name": "simple_action",
+        "description": "Perform a simple action",
+        "tool_slug": "simple_tool",
+        "input_schema": {
+          "type": "object",
+          "properties": {
+            "input": {"type": "string", "description": "Input text"}
+          },
+          "required": ["input"]
+        }
+      }
+    ],
+    
+    "examples": [
+      {
+        "user": "Do something simple",
+        "assistant": "I'll do that for you."
+      }
+    ]
+  },
+  
+  "tool_registry": [
+    {
+      "tool_slug": "simple_tool",
+      "display_name": "Simple Tool",
+      "provider": "pipedream",
+      "auth_type": "none",
+      "scopes": [],
+      "metadata": {
+        "workflow_id": "simple_workflow_999"
+      }
+    }
+  ],
+  
+  "integrations": {
+    "pipedream": {
+      "external_user_ids": {},
+      "project_id": "test_pipedream_project",
+      "client_id": "test_client_id",
+      "client_secret": "test_client_secret"
+    }
+  }
+}

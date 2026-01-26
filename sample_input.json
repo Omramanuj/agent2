@@ -1,0 +1,160 @@
+{
+  "pipeline_id": "test-pipeline-005",
+  "agent_spec_version": "v1",
+  "user_query": "Create an agent that can send Gmail emails and search Pipedream documentation",
+  
+  "agent_spec": {
+    "name": "Gmail and Documentation Agent",
+    "description": "An agent that can send emails via Gmail and search Pipedream documentation using MCP tools",
+    "runtime": {
+      "framework": "google-adk",
+      "language": "python",
+      "model": "gemini-2.5-flash"
+    },
+    
+    "tools_required": [
+      {
+        "tool_slug": "gmail",
+        "provider": "pipedream",
+        "purpose": "Send emails via Gmail using Pipedream MCP",
+        "auth_required": true,
+        "scopes": ["https://www.googleapis.com/auth/gmail.send"],
+        "connection_key": "gmail_connection"
+      },
+      {
+        "tool_slug": "pipedream",
+        "provider": "pipedream",
+        "purpose": "Search Pipedream documentation and knowledge base",
+        "auth_required": false,
+        "scopes": [],
+        "connection_key": "pipedream_docs"
+      }
+    ],
+    
+    "actions": [
+      {
+        "name": "send_email",
+        "description": "Send an email to a recipient with a subject and body using Gmail",
+        "tool_slug": "gmail",
+        "input_schema": {
+          "type": "object",
+          "properties": {
+            "instruction": {
+              "type": "string",
+              "description": "Natural language instruction describing the email to send. Include recipient, subject, and body."
+            },
+            "to": {
+              "type": "string",
+              "description": "Recipient email address(es). Can be a single email or comma-separated list."
+            },
+            "subject": {
+              "type": "string",
+              "description": "Email subject line"
+            },
+            "body": {
+              "type": "string",
+              "description": "Email body content"
+            }
+          },
+          "required": ["instruction"]
+        },
+        "output_schema": {
+          "type": "object",
+          "properties": {
+            "message_id": {"type": "string"},
+            "status": {"type": "string"},
+            "content": {"type": "string"}
+          }
+        }
+      },
+      {
+        "name": "search_pipedream_docs",
+        "description": "Search across the Pipedream knowledge base to find relevant information, code examples, API references, and guides",
+        "tool_slug": "pipedream",
+        "input_schema": {
+          "type": "object",
+          "properties": {
+            "query": {
+              "type": "string",
+              "description": "A query to search the Pipedream content with. Use this to find documentation, examples, or API references."
+            }
+          },
+          "required": ["query"]
+        },
+        "output_schema": {
+          "type": "object",
+          "properties": {
+            "results": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "title": {"type": "string"},
+                  "content": {"type": "string"},
+                  "url": {"type": "string"}
+                }
+              }
+            },
+            "count": {"type": "integer"}
+          }
+        }
+      }
+    ],
+    
+    "examples": [
+      {
+        "user": "Send an email to john@example.com with subject 'Hello' and body 'This is a test email'",
+        "assistant": "I'll send that email for you using Gmail. [Executes send_email action with instruction containing recipient, subject, and body]"
+      },
+      {
+        "user": "Search Pipedream docs for how to use Gmail MCP tools",
+        "assistant": "I'll search the Pipedream documentation for information about Gmail MCP tools. [Executes search_pipedream_docs action]"
+      },
+      {
+        "user": "Email ramanuj.om@protonmail.com and gopaldevmurari20@gmail.com with subject 'Meeting' and body 'Let's schedule a meeting'",
+        "assistant": "I'll send that email to both recipients. [Executes send_email action with multiple recipients]"
+      }
+    ]
+  },
+  
+  "tool_registry": [
+    {
+      "tool_slug": "gmail",
+      "display_name": "Gmail MCP",
+      "provider": "pipedream",
+      "auth_type": "oauth",
+      "scopes": ["https://www.googleapis.com/auth/gmail.send"],
+      "metadata": {
+        "mcp_server_url": "https://remote.mcp.pipedream.net",
+        "app_type": "gmail",
+        "description": "Gmail integration via Pipedream MCP. Tools are discovered dynamically at runtime."
+      }
+    },
+    {
+      "tool_slug": "pipedream",
+      "display_name": "Pipedream Documentation Search",
+      "provider": "pipedream",
+      "auth_type": "none",
+      "scopes": [],
+      "metadata": {
+        "mcp_server_url": "https://remote.mcp.pipedream.net",
+        "app_type": "pipedream",
+        "tool_name": "SearchPipedream",
+        "description": "Search Pipedream knowledge base, documentation, code examples, and API references via MCP"
+      }
+    }
+  ],
+  
+  "integrations": {
+    "pipedream": {
+      "external_user_ids": {
+        "gmail": "pd_user_gmail_123",
+        "pipedream": "pd_user_docs_123"
+      },
+      "project_id": "proj_LosLEnL",
+      "client_id": "NqesH7TGL0ZxfYlYCMusNV9cpYhH4QNL6fhhQs7nmf8",
+      "client_secret": "BfnGhFrOGywFaJeXyCJMpKvWmNFGoXUPjaDUZTA0wTw",
+      "environment": "development"
+    }
+  }
+}

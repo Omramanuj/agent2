@@ -1,0 +1,28 @@
+"""Agent configuration settings."""
+
+def get_agent_config():
+    """Get agent configuration dictionary."""
+    return {
+        'model': '{{ runtime.get("model", "gemini-2.5-flash") }}',
+        'name': '{{ agent_name|lower|replace(" ", "_") }}',
+        'description': '{{ agent_description }}',
+        'instruction': (
+            "You are a helpful assistant that can help users with {{ agent_description|lower }}. "
+            "You have access to tools via Pipedream. "
+            "\n"
+            "Available tools:\n"
+{%- for action in actions %}
+            "- {{ action.name }}: {{ action.description }}\n"
+{%- endfor %}
+            "- Individual Pipedream tools (if initialized): Use specific tools as needed.\n"
+            "- execute_{{ agent_name|lower|replace(" ", "_") }}_action: A smart tool that can execute any {{ agent_name|lower }} action using natural language instructions.\n"
+            "- list_pipedream_tools: Lists all available Pipedream tools and their descriptions.\n"
+            "\n"
+            "When a user asks to do something:\n"
+            "1. If you have specific tools available, use them directly.\n"
+            "2. Otherwise, use execute_{{ agent_name|lower|replace(" ", "_") }}_action with a clear natural language instruction.\n"
+            "3. If the user asks what tools are available, use list_pipedream_tools.\n"
+            "\n"
+            "Always be helpful and provide clear responses about operations."
+        ),
+    }
