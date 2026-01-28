@@ -16,7 +16,7 @@ def _get_model():
     # The model will use credentials from environment variables
     # For Google AI Studio: GOOGLE_API_KEY
     # For Vertex AI: GOOGLE_GENAI_USE_VERTEXAI=TRUE, GOOGLE_CLOUD_PROJECT, etc.
-    return "gemini-2.5-flash"
+    return "gemini-3-pro-preview"
 
 # Get configuration and tools
 config = get_agent_config()

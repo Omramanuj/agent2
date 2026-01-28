@@ -39,8 +39,8 @@ class PipedreamMCPClient:
         client_id: str,
         client_secret: str,
         project_environment: str = "development",
-        external_user_id: str = "test-user-123",
-        app_slug: str = "{{ tools_required[0].tool_slug if tools_required else 'default' }}",
+        external_user_id: str = "{{ default_user_id }}",
+        app_slug: str = "{{ default_app_slug }}",
         mcp_server_url: Optional[str] = None
     ):
         """
@@ -125,11 +125,13 @@ class PipedreamMCPClient:
             "x-pd-app-slug": self.app_slug,
         }
         
+        logger.debug(f"Listing tools from MCP server with app_slug: {self.app_slug}")
+        
         async with streamablehttp_client(self.mcp_server_url, headers=headers) as (read, write, _):
             async with ClientSession(read, write) as session:
                 await session.initialize()
                 tools_response = await session.list_tools()
-                return [
+                tools = [
                     {
                         "name": tool.name,
                         "description": tool.description,
@@ -137,6 +139,8 @@ class PipedreamMCPClient:
                     }
                     for tool in tools_response.tools
                 ]
+                logger.info(f"Found {len(tools)} tools from MCP server")
+                return tools
     
     async def execute_tool(self, tool_name: str, arguments: Dict[str, Any]) -> Dict[str, Any]:
         """Execute a tool via MCP server."""
@@ -148,6 +152,8 @@ class PipedreamMCPClient:
             "x-pd-external-user-id": self.external_user_id,
             "x-pd-app-slug": self.app_slug,
         }
+        
+        logger.debug(f"Executing tool: {tool_name} with {len(arguments)} arguments")
         
         async with streamablehttp_client(self.mcp_server_url, headers=headers) as (read, write, _):
             async with ClientSession(read, write) as session:
@@ -163,12 +169,14 @@ class PipedreamMCPClient:
                         elif hasattr(content, 'type'):
                             content_text.append(str(content))
                     
+                    logger.info(f"Tool {tool_name} executed successfully")
                     return {
                         "success": True,
                         "content": "\n".join(content_text) if content_text else str(result),
                         "raw": result
                     }
                 else:
+                    logger.info(f"Tool {tool_name} executed with no content returned")
                     return {
                         "success": True,
                         "content": "Tool executed successfully",

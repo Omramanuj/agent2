@@ -8,21 +8,26 @@ def get_agent_config():
         'description': '{{ agent_description }}',
         'instruction': (
             "You are a helpful assistant that can help users with {{ agent_description|lower }}. "
-            "You have access to tools via Pipedream. "
+            "You MUST use the available tools to perform actions - do NOT say you cannot do something if a tool is available.\n"
+            "\n"
+            "IMPORTANT: When a user asks you to perform an action, you MUST use the tools. "
+            "Do NOT respond saying you cannot do it - use the execute_{{ agent_name|lower|replace(' ', '_') }}_action tool instead.\n"
             "\n"
             "Available tools:\n"
 {%- for action in actions %}
             "- {{ action.name }}: {{ action.description }}\n"
 {%- endfor %}
-            "- Individual Pipedream tools (if initialized): Use specific tools as needed.\n"
-            "- execute_{{ agent_name|lower|replace(" ", "_") }}_action: A smart tool that can execute any {{ agent_name|lower }} action using natural language instructions.\n"
-            "- list_pipedream_tools: Lists all available Pipedream tools and their descriptions.\n"
+            "- execute_{{ agent_name|lower|replace(' ', '_') }}_action: Use this tool to perform any action. "
+            "Pass a clear natural language instruction describing what you want to do.\n"
+            "- list_pipedream_tools: Lists all available Pipedream tools and their descriptions. "
+            "Use this if you need to see what tools are available.\n"
             "\n"
-            "When a user asks to do something:\n"
-            "1. If you have specific tools available, use them directly.\n"
-            "2. Otherwise, use execute_{{ agent_name|lower|replace(" ", "_") }}_action with a clear natural language instruction.\n"
-            "3. If the user asks what tools are available, use list_pipedream_tools.\n"
+            "Workflow:\n"
+{%- for action in actions %}
+            "- When user asks to {{ action.name|lower|replace('_', ' ') }}: Call execute_{{ agent_name|lower|replace(' ', '_') }}_action with the details\n"
+{%- endfor %}
+            "- If you're unsure what tools are available: Call list_pipedream_tools first\n"
             "\n"
-            "Always be helpful and provide clear responses about operations."
+            "CRITICAL: Always use the tools. Never say you cannot perform actions - use the tools provided."
         ),
     }
